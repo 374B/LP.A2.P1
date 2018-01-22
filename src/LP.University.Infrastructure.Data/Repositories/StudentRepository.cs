@@ -1,5 +1,4 @@
 ﻿using LP.University.Domain.Student;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,16 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LP.University.Infrastructure.Data.Repositories
 {
-    public class StudentDetailsRepository : IStudentDetailsRepository
+    public class StudentRepository : IStudentRepository
     {
         private readonly IDbContextProvider _contextProvider;
 
-        public StudentDetailsRepository(IDbContextProvider contextProvider)
+        public StudentRepository(IDbContextProvider contextProvider)
         {
             _contextProvider = contextProvider;
         }
 
-        public async Task<StudentDetails> GetByStudentId(int studentId)
+        public async Task<StudentDetailsItem> GetDetailsByStudentId(int studentId)
         {
             using (var ctx = _contextProvider.UniversityDbContext())
             {
@@ -31,7 +30,7 @@ namespace LP.University.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<List<StudentDetails>> GetAll()
+        public async Task<List<StudentDetailsItem>> GetDetailsAll()
         {
             using (var ctx = _contextProvider.UniversityDbContext())
             {
@@ -42,9 +41,9 @@ namespace LP.University.Infrastructure.Data.Repositories
         }
 
         //TODO: Mapping shouldn't be here
-        private StudentDetails Map(StudentDetailsModel model)
+        private StudentDetailsItem Map(StudentDetailsModel model)
         {
-            return new StudentDetails(
+            return new StudentDetailsItem(
                 model.StudentId,
                 model.FirstName,
                 model.LastName,

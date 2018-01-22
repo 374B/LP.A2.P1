@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LP.University.Domain.Subject;
 
 namespace LP.University.Domain.Student
 {
@@ -6,7 +7,9 @@ namespace LP.University.Domain.Student
     {
         Student Create();
 
-        Student Create(StudentDetails studentDetails, IEnumerable<Subject.Subject> subjects);
+        Student Create(
+            StudentDetailsItem studentDetails, 
+            IEnumerable<SubjectEnrollment> subjects);
 
     }
 }

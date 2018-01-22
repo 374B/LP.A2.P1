@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LP.University.Domain.Subject;
 
 namespace LP.University.Domain.Student
 {
@@ -14,11 +15,11 @@ namespace LP.University.Domain.Student
         public Student Create()
         {
             return Create(
-                StudentDetails.Default(), 
-                new List<Subject.Subject>());
+                StudentDetailsItem.Default(), 
+                new List<SubjectEnrollment>());
         }
 
-        public Student Create(StudentDetails studentDetails, IEnumerable<Subject.Subject> subjects)
+        public Student Create(StudentDetailsItem studentDetails, IEnumerable<SubjectEnrollment> subjects)
         {
             var student = new Student(
                 _workloadCalculator,

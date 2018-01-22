@@ -2,11 +2,11 @@
 
 namespace LP.University.Domain.Student
 {
-    public class StudentDetails
+    public class StudentDetailsItem
     {
-        public static StudentDetails Default()
+        public static StudentDetailsItem Default()
         {
-            return new StudentDetails(0, string.Empty, string.Empty, new DateTime());
+            return new StudentDetailsItem(0, string.Empty, string.Empty, new DateTime());
         }
 
         public int StudentId { get; }
@@ -14,7 +14,7 @@ namespace LP.University.Domain.Student
         public string LastName { get; }
         public DateTime DateOfBirth { get; }
 
-        public StudentDetails(
+        public StudentDetailsItem(
             int studentId,
             string firstName,
             string lastName,

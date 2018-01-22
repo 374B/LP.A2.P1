@@ -8,5 +8,7 @@ namespace LP.University.Infrastructure.Data
         public UniversityDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<StudentDetailsModel> StudentDetails { get; set; }
+        public DbSet<SubjectDetailsModel> SubjectDetails { get; set; }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using LP.University.API.Dto;
 
@@ -8,19 +9,22 @@ namespace LP.University.API.Controllers
     [Route("api/[controller]")]
     public class SubjectsController : Controller
     {
+        public const string RouteNameSubjectDetails = "SubjectDetails";
+
         [HttpGet]
-        public IEnumerable<SubjectDto> Subjects()
+        public IEnumerable<SubjectDetailsDto> Subjects()
         {
-            return new List<SubjectDto>();
+            return new List<SubjectDetailsDto>();
         }
 
-        [HttpGet("{subjectId}")]
-        public SubjectDto Subject(int subjectId)
+        [HttpGet("{subjectId}", Name = RouteNameSubjectDetails)]
+        public SubjectDetailsDto Subject(int subjectId)
         {
-            return new SubjectDto();
+            return new SubjectDetailsDto();
         }
 
         [HttpGet("{subjectId}/enrollments")]
+        [ProducesResponseType(typeof(StudentItemDto), (int)HttpStatusCode.OK)]
         public object SubjectEnrollments(int subjectId)
         {
             throw new NotImplementedException();

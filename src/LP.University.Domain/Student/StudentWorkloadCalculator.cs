@@ -11,7 +11,8 @@ namespace LP.University.Domain.Student
         {
             if (student == null) throw new ArgumentNullException(nameof(student));
 
-            var subjects = student.EnrolledSubjects;
+            var subjects = student.CurrentSubjects()
+                .Select(x => x.Subject);
 
             return CalculateWeeklyWorkload(subjects);
         }
@@ -29,7 +30,7 @@ namespace LP.University.Domain.Student
         {
             if (lectures == null) throw new ArgumentNullException(nameof(lectures));
 
-            var total =  lectures.Sum(x => x.Duration);
+            var total = lectures.Sum(x => x.Duration);
 
             return total;
         }

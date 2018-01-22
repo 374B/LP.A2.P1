@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using LP.University.Domain.Student;
+using LP.University.Domain.Subject;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -17,8 +18,8 @@ namespace LP.University.Domain.Tests.Student
 
             var sut = new Domain.Student.Student(
                 calcMock.Object,
-                StudentDetails.Default(),
-                new List<Subject.Subject>());
+                StudentDetailsItem.Default(),
+                new List<SubjectEnrollment>());
 
             //Act
 

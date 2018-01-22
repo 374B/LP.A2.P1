@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using LP.University.Domain.Student;
+using LP.University.Domain.Subject;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LP.University.Domain.Tests.Student
 {
+    //TODO: Missing tests to ensure only current subjects are included in calculations
     [TestClass]
     public class StudentWorkloadCalculatorTests
     {
@@ -15,7 +17,8 @@ namespace LP.University.Domain.Tests.Student
             //Arrange
 
             var sut = new StudentWorkloadCalculator();
-            var student = new Domain.Student.Student(sut, StudentDetails.Default(), new List<Subject.Subject>());
+
+            var student = new Domain.Student.Student(sut, StudentDetailsItem.Default(), new List<SubjectEnrollment>());
 
             //Act
 
@@ -34,9 +37,10 @@ namespace LP.University.Domain.Tests.Student
 
             var sut = new StudentWorkloadCalculator();
 
-            var subjects = new List<Subject.Subject> { new Subject.Subject() };
+            var subjects = CreateSubjectEnrollmentsFromTimespans(
+                new TimeSpan[0]);
 
-            var student = new Domain.Student.Student(sut, StudentDetails.Default(), subjects);
+            var student = new Domain.Student.Student(sut, StudentDetailsItem.Default(), subjects);
 
             //Act
 
@@ -55,14 +59,13 @@ namespace LP.University.Domain.Tests.Student
 
             var sut = new StudentWorkloadCalculator();
 
-            var subjects = new[]
-            {
-                new Subject.Subject(),
-                new Subject.Subject(),
-                new Subject.Subject()
-            };
+            var subjects = CreateSubjectEnrollmentsFromTimespans(
+                new TimeSpan[0],
+                new TimeSpan[0],
+                new TimeSpan[0]);
 
-            var student = new Domain.Student.Student(sut, StudentDetails.Default(), subjects);
+
+            var student = new Domain.Student.Student(sut, StudentDetailsItem.Default(), subjects);
 
             //Act
 
@@ -82,14 +85,13 @@ namespace LP.University.Domain.Tests.Student
             var duration = TimeSpan.FromTicks(1234);
 
             //1 subject with 1 lecture
-            var subj = new Subject.Subject(new[]
-            {
-                new Lecture.Lecture{ Duration = duration }
-            });
+
+            var subjects = CreateSubjectEnrollmentsFromTimespans(
+                new[] { duration });
 
             var sut = new StudentWorkloadCalculator();
 
-            var student = new Domain.Student.Student(sut, StudentDetails.Default(), new[] { subj });
+            var student = new Domain.Student.Student(sut, StudentDetailsItem.Default(), subjects);
 
             //Act
 
@@ -111,16 +113,13 @@ namespace LP.University.Domain.Tests.Student
             var duration3 = TimeSpan.FromTicks(1234);
 
             //1 subject with multiple lectures
-            var subj = new Subject.Subject(new[]
-            {
-                new Lecture.Lecture{ Duration = duration1 },
-                new Lecture.Lecture{ Duration = duration2 },
-                new Lecture.Lecture{ Duration = duration3 },
-            });
+
+            var subjects = CreateSubjectEnrollmentsFromTimespans(
+                new[] { duration1, duration2, duration3 });
 
             var sut = new StudentWorkloadCalculator();
 
-            var student = new Domain.Student.Student(sut, StudentDetails.Default(), new[] { subj });
+            var student = new Domain.Student.Student(sut, StudentDetailsItem.Default(), subjects);
 
             //Act
 
@@ -144,15 +143,16 @@ namespace LP.University.Domain.Tests.Student
             var duration3 = TimeSpan.FromTicks(1234);
 
             //Multiple subjects, each with 1 lecture
-            var subj1 = new Subject.Subject(new[] { new Lecture.Lecture { Duration = duration1 } });
-            var subj2 = new Subject.Subject(new[] { new Lecture.Lecture { Duration = duration1 } });
-            var subj3 = new Subject.Subject(new[] { new Lecture.Lecture { Duration = duration1 } });
 
-            var subjects = new[] { subj1, subj2, subj3 };
+            var subjects = CreateSubjectEnrollmentsFromTimespans(
+                new[] { duration1 },
+                new[] { duration2 },
+                new[] { duration3 }
+            );
 
             var sut = new StudentWorkloadCalculator();
 
-            var student = new Domain.Student.Student(sut, StudentDetails.Default(), subjects);
+            var student = new Domain.Student.Student(sut, StudentDetailsItem.Default(), subjects);
 
             //Act
 
@@ -180,29 +180,15 @@ namespace LP.University.Domain.Tests.Student
 
             //Multiple subjects, each with multiple lectures
 
-            var subjA = new Subject.Subject(new[]
-            {
-                new Lecture.Lecture { Duration = durationA1 },
-                new Lecture.Lecture { Duration = durationA2 }
-            });
-
-            var subjB = new Subject.Subject(new[]
-            {
-                new Lecture.Lecture { Duration = durationB1 },
-                new Lecture.Lecture { Duration = durationB2 }
-            });
-
-            var subjC = new Subject.Subject(new[]
-            {
-                new Lecture.Lecture { Duration = durationC1 },
-                new Lecture.Lecture { Duration = durationC2 }
-            });
-
-            var subjects = new[] { subjA, subjB, subjC };
+            var subjects = CreateSubjectEnrollmentsFromTimespans(
+                    new[] { durationA1, durationA2 },
+                    new[] { durationB1, durationB2 },
+                    new[] { durationC1, durationC2 }
+                );
 
             var sut = new StudentWorkloadCalculator();
 
-            var student = new Domain.Student.Student(sut, StudentDetails.Default(), subjects);
+            var student = new Domain.Student.Student(sut, StudentDetailsItem.Default(), subjects);
 
             //Act
 
@@ -216,6 +202,41 @@ namespace LP.University.Domain.Tests.Student
                 + durationC1 + durationC2;
 
             Assert.AreEqual(expectedDuration, workload);
+        }
+
+        /// <summary>
+        /// Helper method to create a subject for each group of lectures (timespans)
+        /// I.E Each of timespans will return a corresponding SubjectEnrollment
+        /// </summary>
+        /// <param name="lectureGroups"></param>
+        /// <returns></returns>
+        private List<SubjectEnrollment> CreateSubjectEnrollmentsFromTimespans(params IEnumerable<TimeSpan>[] lectureGroups)
+        {
+            var subjectEnrollments = new List<SubjectEnrollment>();
+
+            var session = new SubjectSession
+            {
+                Start = DateTime.Now.AddDays(-1),
+                End = DateTime.Now.AddDays(1)
+            };
+
+            foreach (var lectureGroup in lectureGroups)
+            {
+                var lectures = new List<Lecture.Lecture>();
+
+                foreach (var timeSpan in lectureGroup)
+                {
+                    lectures.Add(new Lecture.Lecture { Duration = timeSpan });
+                }
+
+                var subject = new Subject.Subject(lectures);
+                var subjectEnrollment = new SubjectEnrollment(subject, session);
+
+                subjectEnrollments.Add(subjectEnrollment);
+
+            }
+
+            return subjectEnrollments;
         }
 
     }

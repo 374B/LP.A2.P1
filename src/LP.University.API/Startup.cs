@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using LP.University.API.Filters;
 using LP.University.Infrastructure.Data.InMemory;
 using LP.University.Infrastructure.Registrar;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +22,12 @@ namespace LP.University.API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                //options.Filters.AddService<ExceptionFilter>();
+                options.Filters.Add(new ExceptionFilter());
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info
@@ -33,11 +39,7 @@ namespace LP.University.API
                 c.IncludeXmlComments(Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "LP.University.API.xml"));
             });
 
-            var registrar = new Registrar();
-
-            registrar.RegisterServices(services);
-
-
+            RegisterServices(services);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -51,16 +53,27 @@ namespace LP.University.API
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "LP.University.API V1");
                 });
 
-               SetFakeData();
+                SetFakeData();
             }
 
             app.UseMvc();
 
         }
 
+        private void RegisterServices(IServiceCollection services)
+        {
+            //Register services outside this project
+            var registrar = new Registrar();
+            registrar.RegisterServices(services);
+
+            //Register local services
+            //...
+
+        }
+
         private void SetFakeData()
         {
-            FakeData.StudentDetails(10);
+            new FakeData().Generate(20, 10);
         }
     }
 }

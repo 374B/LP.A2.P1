@@ -1,21 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using LP.University.API.Dto;
 using LP.University.Domain.Student;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using LP.University.API.Extensions;
+using LP.University.API.Mappers;
 
 namespace LP.University.API.Controllers
 {
     [Route("api/[controller]")]
     public class StudentsController : Controller
     {
-        //TODO: Review use of repository at this layer
-        private readonly IStudentDetailsRepository _studentDetailsRepository;
+        //TODO: Remove route provider, hard code
+        //TODO: Link to enrollment
 
-        public StudentsController(IStudentDetailsRepository studentDetailsRepository)
+        public const string RouteStudentDetails = "StudentDetails";
+        public const string RouteStudentSubjects = "StudentSubjects";
+
+        private readonly IStudentService _studentService;
+
+        public StudentsController(IStudentService studentService)
         {
-            _studentDetailsRepository = studentDetailsRepository;
+            if (studentService == null) throw new ArgumentNullException(nameof(studentService));
+
+            _studentService = studentService;
         }
 
         /// <summary>
@@ -23,20 +34,25 @@ namespace LP.University.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<List<StudentDto>> Get()
+        [ProducesResponseType(typeof(List<StudentItemDto>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Get()
         {
-            var studentDetails = await _studentDetailsRepository.GetAll();
+            var studentDetails = await _studentService.GetDetailsAll();
+            var mapper = new StudentItemMapper();
 
-            //TODO: Mapper
+            var dtos = new List<StudentItemDto>();
 
-            var dtos = studentDetails.Select(x => new StudentDto
+            foreach (var item in studentDetails)
             {
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                DateOfBirth = x.DateOfBirth
-            }).ToList();
+                var dto = mapper.Map(item);
 
-            return dtos;
+                dto.Links.Details = RouteStudentDetails.GetLink(this, new { studentId = item.StudentId });
+
+                dtos.Add(dto);
+
+            }
+
+            return Ok(dtos);
         }
 
         /// <summary>
@@ -44,12 +60,45 @@ namespace LP.University.API.Controllers
         /// </summary>
         /// <param name="studentId"></param>
         /// <returns></returns>
-        [HttpGet("{studentId}")]
-        public IEnumerable<string> Get(int studentId)
+        [HttpGet("{studentId}", Name = RouteStudentDetails)]
+        [ProducesResponseType(typeof(StudentDetailsDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Get(int studentId)
         {
-            return new string[] { "value1", "value2" };
+            var studentDetails = await _studentService.GetDetailsByStudentId(studentId);
+
+            if (studentDetails == null)
+                return NotFound($"No resource found for studentId: {studentId}");
+
+            var dto = new StudentDetailsMapper().Map(studentDetails);
+            dto.Links.Subjects = RouteStudentSubjects.GetLink(this, new { studentId = studentId });
+
+            return Ok(dto);
+
         }
 
+        /// <summary>
+        /// Returns an array of the specified student's subjects
+        /// </summary>
+        /// <param name="studentId"></param>
+        /// <returns></returns>
+        [HttpGet("{studentId}/subjects", Name = RouteStudentSubjects)]
+        [ProducesResponseType(typeof(List<SubjectItemDto>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> StudentSubjects(int studentId)
+        {
+            var student = await _studentService.GetAggregateByStudentId(studentId);
+
+            if (student == null)
+                return NotFound($"No resource found for studentId: {studentId}");
+
+            var subjects = student.CurrentSubjects();
+
+            var mapper = new SubjectItemMapper();
+
+            var dtos = subjects.Select(mapper.Map);
+
+            return Ok(dtos);
+
+        }
     }
 }
 

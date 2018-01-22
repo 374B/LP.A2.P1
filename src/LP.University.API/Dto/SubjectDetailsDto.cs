@@ -1,6 +1,6 @@
 ﻿namespace LP.University.API.Dto
 {
-    public class SubjectDto
+    public class SubjectDetailsDto
     {
     }
 }
