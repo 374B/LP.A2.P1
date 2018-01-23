@@ -214,12 +214,6 @@ namespace LP.University.Domain.Tests.Student
         {
             var subjectEnrollments = new List<SubjectEnrollment>();
 
-            var session = new SubjectSession
-            {
-                Start = DateTime.Now.AddDays(-1),
-                End = DateTime.Now.AddDays(1)
-            };
-
             foreach (var lectureGroup in lectureGroups)
             {
                 var lectures = new List<Lecture.Lecture>();
@@ -229,8 +223,10 @@ namespace LP.University.Domain.Tests.Student
                     lectures.Add(new Lecture.Lecture { Duration = timeSpan });
                 }
 
-                var subject = new Subject.Subject(lectures);
-                var subjectEnrollment = new SubjectEnrollment(subject, session);
+                var details = new SubjectDetailsItem(1, "Code", "Name", "Desc");
+                
+                var subject = new Subject.Subject(details, lectures, new List<SubjectEnrollmentItem>());
+                var subjectEnrollment = new SubjectEnrollment(subject);
 
                 subjectEnrollments.Add(subjectEnrollment);
 

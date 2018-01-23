@@ -10,5 +10,9 @@ namespace LP.University.Domain.Subject
         Task<List<SubjectEnrollment>> GetEnrolledSubjectsByStudentId(int studentId);
 
         Task<SubjectDetailsItem> GetSubjectDetailsBySubjectId(int subjectId);
+
+        Task<List<SubjectDetailsItem>> GetSubjectDetailsAll();
+
+        Task EnrollStudent(int subjectId, int studentId);
     }
 }

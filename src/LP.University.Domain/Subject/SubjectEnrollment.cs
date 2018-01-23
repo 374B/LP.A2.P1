@@ -3,14 +3,10 @@
     public class SubjectEnrollment
     {
         public Subject Subject { get; }
-        public SubjectSession Session { get; }
 
-        public SubjectEnrollment(
-            Subject subject, 
-            SubjectSession session)
+        public SubjectEnrollment(Subject subject)
         {
             Subject = subject;
-            Session = session;
         }
     }
 }

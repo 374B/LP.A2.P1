@@ -73,7 +73,7 @@ namespace LP.University.API
 
         private void SetFakeData()
         {
-            new FakeData().Generate(20, 10);
+            new FakeData().Generate(20, 10, 1, 5, 1, 3);
         }
     }
 }

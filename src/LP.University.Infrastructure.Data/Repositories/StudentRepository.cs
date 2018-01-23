@@ -1,4 +1,5 @@
-﻿using LP.University.Domain.Student;
+﻿using System;
+using LP.University.Domain.Student;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace LP.University.Infrastructure.Data.Repositories
         {
             using (var ctx = _contextProvider.UniversityDbContext())
             {
-                var model = await ctx.StudentDetails.SingleAsync(x => x.StudentId == studentId);
+                var model = await ctx.StudentDetails.SingleOrDefaultAsync(x => x.StudentId == studentId);
 
                 if (model == null)
                     return null;

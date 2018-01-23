@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LP.University.Core.Extensions;
 using LP.University.Domain.Subject;
 
 namespace LP.University.Domain.Student
@@ -36,9 +35,18 @@ namespace LP.University.Domain.Student
 
         public IEnumerable<SubjectEnrollment> CurrentSubjects()
         {
-            return _enrolledSubjects.Where(x =>
-                x.Session.Start.InPast() && x.Session.End.InFuture());
+            //TODO: There is no concept of subject sessions so let's return all subjects for now
+            return AllSubjects();
         }
 
+        public bool CanEnroll(Subject.Subject subject, out IEnumerable<string> violations)
+        {
+            var specList = new SubjectEnrollmentSpec(subject, this);
+            var result = specList.IsSatisfied();
+
+            violations = result.Violations;
+            return result.IsSatisifed;
+            
+        }
     }
 }

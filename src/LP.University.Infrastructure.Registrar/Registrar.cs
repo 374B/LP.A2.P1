@@ -1,4 +1,5 @@
-﻿using LP.University.Domain.Student;
+﻿using LP.University.Domain.Lecture;
+using LP.University.Domain.Student;
 using LP.University.Domain.Subject;
 using LP.University.Infrastructure.Data;
 using LP.University.Infrastructure.Data.InMemory;
@@ -23,6 +24,9 @@ namespace LP.University.Infrastructure.Registrar
             services.AddSingleton<ISubjectFactory, SubjectFactory>();
             services.AddSingleton<ISubjectRepository, SubjectRepository>();
             services.AddSingleton<ISubjectService, SubjectService>();
+
+            //Lecture
+            services.AddSingleton<ILectureRepository, LectureRepository>();
 
         }
     }

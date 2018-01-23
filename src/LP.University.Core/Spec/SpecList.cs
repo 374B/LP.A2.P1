@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace LP.University.Core.Spec
 {
-    public abstract class SpecList : ISpec
+    public abstract class SpecList
     {
         private List<ISpec> _specs;
 
@@ -23,21 +23,40 @@ namespace LP.University.Core.Spec
 
         protected abstract IEnumerable<ISpec> Specifications();
 
-        public bool IsSatisfied()
+        public SpecListResult IsSatisfied()
         {
             var satisfied = true;
+            var violations = new List<string>();
 
             foreach (var spec in Specs)
             {
                 if (!spec.IsSatisfied())
                 {
                     satisfied = false;
+                    violations.Add(spec.Description);
                     break;
                 }
             }
 
-            return satisfied;
+            var result = new SpecListResult(satisfied, violations);
+            return result;
 
         }
+
+        public class SpecListResult
+        {
+            private readonly List<string> _violations;
+
+            public bool IsSatisifed { get; }
+            public IEnumerable<string> Violations => _violations;
+
+            public SpecListResult(bool isSatisfied, List<string> violations)
+            {
+                IsSatisifed = isSatisfied;
+                _violations = violations;
+            }
+
+        }
+
     }
 }

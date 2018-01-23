@@ -6,7 +6,6 @@ using LP.University.API.Dto;
 using LP.University.Domain.Student;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using LP.University.API.Extensions;
 using LP.University.API.Mappers;
 
 namespace LP.University.API.Controllers
@@ -14,12 +13,6 @@ namespace LP.University.API.Controllers
     [Route("api/[controller]")]
     public class StudentsController : Controller
     {
-        //TODO: Remove route provider, hard code
-        //TODO: Link to enrollment
-
-        public const string RouteStudentDetails = "StudentDetails";
-        public const string RouteStudentSubjects = "StudentSubjects";
-
         private readonly IStudentService _studentService;
 
         public StudentsController(IStudentService studentService)
@@ -46,7 +39,7 @@ namespace LP.University.API.Controllers
             {
                 var dto = mapper.Map(item);
 
-                dto.Links.Details = RouteStudentDetails.GetLink(this, new { studentId = item.StudentId });
+                dto.Links.Details =  new LinkDto { Href = $"api/students/{item.StudentId}" };
 
                 dtos.Add(dto);
 
@@ -60,7 +53,7 @@ namespace LP.University.API.Controllers
         /// </summary>
         /// <param name="studentId"></param>
         /// <returns></returns>
-        [HttpGet("{studentId}", Name = RouteStudentDetails)]
+        [HttpGet("{studentId}")]
         [ProducesResponseType(typeof(StudentDetailsDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get(int studentId)
         {
@@ -70,7 +63,7 @@ namespace LP.University.API.Controllers
                 return NotFound($"No resource found for studentId: {studentId}");
 
             var dto = new StudentDetailsMapper().Map(studentDetails);
-            dto.Links.Subjects = RouteStudentSubjects.GetLink(this, new { studentId = studentId });
+            dto.Links.Subjects = new LinkDto { Href = $"api/students/{studentId}/subjects" };
 
             return Ok(dto);
 
@@ -81,7 +74,7 @@ namespace LP.University.API.Controllers
         /// </summary>
         /// <param name="studentId"></param>
         /// <returns></returns>
-        [HttpGet("{studentId}/subjects", Name = RouteStudentSubjects)]
+        [HttpGet("{studentId}/subjects")]
         [ProducesResponseType(typeof(List<SubjectItemDto>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> StudentSubjects(int studentId)
         {
