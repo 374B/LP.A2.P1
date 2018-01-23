@@ -1,7 +1,8 @@
 The solution should work out of the box.
+
 There is an in-memory database with some fake seed data.
-When API is started it should launch the swagger UI, which provides both API documentation and a test harness.
-If it does not launch, it can be accessed at /swagger
+
+When API is started it should launch the swagger UI, which provides both API documentation and a test harness. If it does not launch, it can be accessed at /swagger
 
 The focus was on demonstrating a variety of concepts rather than focusing on one area in particular.
 
@@ -31,3 +32,4 @@ Tests:
 
 Misc
 - There is no logging
+- Error handling is minimal
